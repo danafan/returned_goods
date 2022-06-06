@@ -12,6 +12,7 @@
 				</div>
 			</AutoComplete>
 				<Input v-model="i_id" placeholder="请输入款式编码" clearable style="width: 200px" />
+				<Input v-model="remark" placeholder="请输入备注" clearable style="width: 200px" />
 				<Button type="info" @click="hangechange(1)">查询</Button>
 			</FormItem>
 		</Form>
@@ -53,6 +54,7 @@
 				end_date:"",
 				provides: '',
 				i_id:"",
+				remark:"",
 				gysList:[],		//供应商列表
 				tableData: [],	//列表数据
 				total: 0,
@@ -110,7 +112,8 @@
 						start_date:this.start_date,
 						end_date:this.end_date,
 						supplier:this.provides,
-						i_id:this.i_id
+						i_id:this.i_id,
+						remark:this.remark
 					}
 				})
 				.then(res => {
@@ -119,7 +122,7 @@
 				});
 			},
 			excel() {
-				window.location.href = "/admin/goods/returngoodsexport?start_date=" + this.start_date + '&end_date=' + this.end_date + '&supplier=' + this.provides + '&i_id=' + this.i_id; 
+				window.location.href = "/admin/goods/returngoodsexport?start_date=" + this.start_date + '&end_date=' + this.end_date + '&supplier=' + this.provides + '&i_id=' + this.i_id + '&remark=' + this.remark; 
 			},
 
 		},
