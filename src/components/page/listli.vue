@@ -13,6 +13,8 @@
 		<el-table :data="tableData" border style="width: 100%">
 			<el-table-column prop="sort_id" label="序号">
 			</el-table-column>
+			<el-table-column prop="package_id" label="包裹号">
+			</el-table-column>
 			<el-table-column prop="supplier_name" label="供应商名称">
 			</el-table-column>
 			<el-table-column prop="goods_num" label="商品数量">
@@ -21,7 +23,6 @@
 			</el-table-column>
 			<el-table-column prop="username" label="作废人">
 			</el-table-column>
-			
 			<el-table-column label="操作">
 				<template slot-scope="scope">
 					<Button type="primary" @click="see(scope.$index, scope.row)">查看详情</Button>

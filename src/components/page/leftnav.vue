@@ -74,6 +74,11 @@
 			<el-button v-if="scope.row.exception_status == 1" type="text" @click="handleEdit(scope.$index, scope.row,2)">处理通知</el-button>
 		</template>
 	</el-table-column>
+	<el-table-column label="签名" width="120">
+		<template slot-scope="scope">
+			<img class="routere" v-if="scope.row.sign_img != ''" style="width: 80px;height: 80px" :src="scope.row.sign_img" @click="bigImg(scope.row.sign_img)">
+		</template>
+	</el-table-column>
 	<el-table-column width="550" label="操作">
 		<template slot-scope="scope">
 			<el-button type="primary" @click="handleEditss(scope.$index, scope.row)">查看包裹码</el-button>
@@ -140,12 +145,18 @@
 	</div>
 </el-dialog>
 <Modal title="包裹码" v-model="modal7" :closable="false">
-		<p style="text-align: center;height: 250px;">
-			<img :src="img" alt="" style="widows: 100px;height: 250px;">
-		</p>
-		<div slot="footer">
-		</div>
-	</Modal>
+	<p style="text-align: center;height: 250px;">
+		<img :src="img" alt="" style="widows: 100px;height: 250px;">
+	</p>
+	<div slot="footer">
+	</div>
+</Modal>
+<Modal v-model="modal3" width="80%">
+	<div class="asd">
+		<img class="routere" :src="big_img_url">
+	</div>
+	
+</Modal>
 </div>
 </template>
 
@@ -264,9 +275,15 @@
 				current1: 1,
 				id: '',
 				statusmodel: false,
+				modal3:false,
+				big_img_url:""
 			}
 		},
 		methods: {
+			bigImg(big_img_url){
+				this.modal3 = true;
+				this.big_img_url = big_img_url;
+			},
 			handleEditss(index, row) {
 				this.img = '';
 				this.modal7 = true;
@@ -859,5 +876,13 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appea
 .num_icon{
 	margin-left: 20px;
 	font-size: 20px;
+}
+.asd{
+	display:flex;
+	align-items: center;
+	justify-content: center;
+}
+.routere{
+	transform: rotate(-90deg);
 }
 </style>
