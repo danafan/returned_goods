@@ -1,7 +1,6 @@
 <template>
 	<div class="leftnav">
 		<h3>退货管理</h3>
-
 		<Form :model="formItem" :label-width="80" style="margin-top: 50px;text-align: left;" onsubmit="return false">
 			<FormItem>
 				<DatePicker :transfer="true" :value="dateArr" format="yyyy-MM-dd" type="daterange" placement="bottom-end" placeholder="选择日期" :clearable="false" style="width: 200px" @on-change="changeDate"></DatePicker>
@@ -37,6 +36,10 @@
 	<Select v-model="is_draw_bill" style="width:200px">
 		<Option v-for="item in drawBillList" :key="item.value" :value="item.value">{{ item.text }}</Option>
 	</Select>
+	<!-- 仓库选择 -->
+	<Select v-model="wms_co_id" style="width:200px" placeholder="请选择仓库">
+		<Option v-for="item in wmsList" :key="item.wms_co_id" :value="item.wms_co_id">{{ item.name }}</Option>
+	</Select>
 	<Input v-model="remark" placeholder="请输入备注" clearable style="width: 200px" />
 	<Button type="info" @click="search">查询</Button>
 </FormItem>
@@ -56,6 +59,8 @@
 </div>
 <el-table :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
 	<el-table-column prop="supplier_name" label="供应商名称">
+	</el-table-column>
+	<el-table-column prop="wms_name" label="仓库">
 	</el-table-column>
 	<el-table-column prop="package_id" label="包裹ID">
 	</el-table-column>
@@ -128,6 +133,13 @@
 			供应商：
 			<el-select size="small" v-model="select_gys_id" clearable :popper-append-to-body="false" filterable placeholder="选择供应商">
 				<el-option v-for="item in gysList" :key="item.supplier_id" :label="item.supplier_name" :value="item.supplier_id">
+				</el-option>
+			</el-select>
+		</div>
+		<div class="goods_row">
+			仓库：
+			<el-select size="small" v-model="wms_id" clearable :popper-append-to-body="false" filterable placeholder="选择仓库">
+				<el-option v-for="item in wmsList" :key="item.wms_co_id" :label="item.name" :value="item.wms_co_id">
 				</el-option>
 			</el-select>
 		</div>
@@ -276,7 +288,11 @@
 				id: '',
 				statusmodel: false,
 				modal3:false,
-				big_img_url:""
+				big_img_url:"",
+				wmsList:[],					//仓库列表
+				wms_co_id:"",			//查询条件仓库
+				wms_id:"",				//批量打包选中的仓库
+
 			}
 		},
 		methods: {
@@ -326,6 +342,15 @@
 				this.select_gys_id = "";
 				this.select_dyj_id = "";
 			},
+			//获取仓库列表
+			getWmsList(){
+				this.$axios.get('/ajax_wms', {
+					params: {}
+				})
+				.then(res => {
+					this.wmsList = res.data.data;
+				});
+			},
 			//获取供应商列表
 			getGysList(){
 				this.$axios.get('/admin/supplier/ajaxsupplierlist', {
@@ -358,6 +383,10 @@
 					this.$message.warning('请选择供应商'); 
 					return;
 				}
+				if(this.wms_id == ''){
+					this.$message.warning('请选择仓库'); 
+					return;
+				}
 				if(this.select_dyj_id == ''){
 					this.$message.warning('请选择打印机'); 
 					return;
@@ -365,7 +394,8 @@
 				let arg = {
 					data:JSON.stringify(this.goodsList),
 					supplier_id:this.select_gys_id,
-					printer:this.select_dyj_id
+					printer:this.select_dyj_id,
+					wms_id:this.wms_id
 				}
 				this.$axios.post('admin/package/pack', arg).then(res => {
 					if (res.data.code == 1) {
@@ -541,7 +571,6 @@
 				this.vuecount = 1;
 			},
 			search() {
-				console.log(this.dateArr);
 				this.current = 1;
 				this.type1 = 0;
 				this.userlist();
@@ -573,23 +602,23 @@
 			excel() {
 				if (this.type1 === 1) {
 					if (this.supplier_id) {
-						window.location.href = "/admin/goods/goodsexport?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/goodsexport?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 					} else if (this.formItem.sku) {
-						window.location.href = "/admin/goods/goodsexport?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/goodsexport?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 					} else if (this.formItem.id) {
-						window.location.href = "/admin/goods/goodsexport?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/goodsexport?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 					} else if (this.carnumber) {
-						window.location.href = "/admin/goods/goodsexport?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/goodsexport?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 					} else if (this.peoplename) {
-						window.location.href = "/admin/goods/goodsexport?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/goodsexport?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 					} else {
-						window.location.href = "/admin/goods/goodsexport?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/goodsexport?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 					}
 				} else {
 					window.location.href = "/admin/goods/goodsexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem
 					.end_date + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
 					'&username=' + this.formItem.peoplename +
-					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 				}
 			},
 			excel1() {
@@ -778,7 +807,8 @@
 						status: this.show1 == 6?0:this.btnvalue,
 						exception_status:this.selSign,
 						is_draw_bill:this.is_draw_bill,
-						remark:this.remark
+						remark:this.remark,
+						wms_co_id:this.wms_co_id
 					},
 
 				})
@@ -819,6 +849,8 @@
 			this.formItem.end_date = myyear+"-"+mymonth + "-" + myweekday;
 			this.allsearch();
 			this.userlist();
+			//获取仓库列表
+			this.getWmsList();
 		}
 	}
 </script>
