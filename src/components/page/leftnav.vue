@@ -52,12 +52,14 @@
 		<Button class="setBut" type="success" @click="excel">导出Excel</Button>
 		<Button class="setBut" type="success" @click="excel1">档口号Excel</Button>
 		<Button class="setBut" type="success" @click="shabi">导出送达</Button>
-		<Button class="setBut" type="success" @click="signSel" v-if="isSelected">标记已选</Button>
+		<Button class="setBut" type="success" @click="signSel">标记已选</Button>
+		<Button class="setBut" type="success" @click="addExpress(false)">批量填写快递单号</Button>
 	</div>
 	
 	<Button type="success" @click="setPackage">批量打包</Button>
 </div>
-<el-table :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
+<el-table :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange" ref="multipleTable">
+	<el-table-column type="selection" width="55" fixed="left"></el-table-column>
 	<el-table-column prop="supplier_name" label="供应商名称">
 	</el-table-column>
 	<el-table-column prop="wms_name" label="仓库">
@@ -72,6 +74,8 @@
 	</el-table-column>
 	<el-table-column prop="draw_bill" label="开单状态">
 	</el-table-column>
+	<el-table-column prop="express_no" show-overflow-tooltip label="快递单号">
+	</el-table-column>
 	<el-table-column prop="remark" show-overflow-tooltip label="备注">
 	</el-table-column>
 	<el-table-column label="异常状态">
@@ -84,8 +88,9 @@
 			<img class="routere" v-if="scope.row.sign_img != ''" style="width: 80px;height: 80px" :src="scope.row.sign_img" @click="bigImg(scope.row.sign_img)">
 		</template>
 	</el-table-column>
-	<el-table-column width="550" label="操作">
+	<el-table-column width="650" label="操作">
 		<template slot-scope="scope">
+			<el-button type="primary" @click="addExpress(scope.row.package_id,scope.row.express_no)">填写快递单号</el-button>
 			<el-button type="primary" @click="handleEditss(scope.$index, scope.row)">查看包裹码</el-button>
 			<el-button type="primary" v-if="scope.row.is_draw_bill == 0 && scope.row.status_id == 4" @click="tagDraw(scope.row.package_id)">标记已开单</el-button>
 			<el-button type="primary" v-if="scope.row.status_id < 4 && scope.row.exception_status == 0" @click="biao(scope.row.package_id)">标记异常</el-button>
@@ -94,11 +99,6 @@
 			<el-button type="primary" @click="goodslist(scope.$index, scope.row)">商品详情</el-button>
 		</template>
 	</el-table-column>
-	<el-table-column
-	v-if="isSelected"
-	type="selection"
-	width="80">
-</el-table-column>
 </el-table>
 <Page :total="total" show-total id="page" @on-change="hangechange" :current="current" />
 <Modal v-model="modal1" title="商品包裹详情" :closable="false">
@@ -169,6 +169,14 @@
 	</div>
 	
 </Modal>
+<!-- 填写快递单号 -->
+<el-dialog title="填写快递单号" @close="closeDialog" width="40%" :close-on-click-modal="false" :visible.sync="expressDialog">
+	<el-input type="textarea" :rows="3" placeholder="请输入快递单号" v-model="express_value"></el-input>
+	<div slot="footer" class="dialog-footer">
+		<el-button type="primary" size="small" @click="expressDialog = false">取消</el-button>
+		<el-button type="primary" size="small" @click="commitExpress">提交</el-button>
+	</div>
+</el-dialog>
 </div>
 </template>
 
@@ -240,7 +248,6 @@
 				}
 				],					//开单状态
 				selSign:0,			//选中的标记
-				isSelected:false,	//默认最左侧多选框不展示
 				multipleSelection:[],
 				btnarr: [{
 					value: 0,
@@ -292,7 +299,9 @@
 				wmsList:[],					//仓库列表
 				wms_co_id:"",			//查询条件仓库
 				wms_id:"",				//批量打包选中的仓库
-
+				expressDialog:false,	//填写快递单号弹窗
+				express_value:"",		//填写的快递单号
+				package_id:"",			//点击的ID
 			}
 		},
 		methods: {
@@ -312,7 +321,47 @@
 						// console.log(res.data)
 						this.img = res.request.responseURL;
 					});
-
+			},
+			//点击填写快递单号
+			addExpress(package_id,express_no){
+				if(!package_id && this.multipleSelection.length == 0){
+					this.$message.warning('请至少选择一项'); 
+					return;
+				}
+				if(!!package_id){
+					this.express_value = express_no;
+				}
+				this.package_id = package_id?package_id:'';
+				this.expressDialog = true;
+			},
+			//提交快递单号
+			commitExpress(){
+				if(this.express_value == ''){
+					this.$message.warning('请填写快递单号'); 
+				}else{
+					let ids = [];
+					if(this.package_id == ''){
+						this.multipleSelection.map(item => {
+							ids.push(item.package_id);
+						})
+					}else{
+						ids.push(this.package_id);
+					}
+					let arg = {
+						package_id:ids.join(','),
+						express_no:this.express_value
+					}
+					this.$axios.post('admin/goods/editexpress', arg).then(res => {
+						if (res.data.code == 1) {
+							this.$Message.success(res.data.msg);
+							this.expressDialog = false;
+							//表格渲染
+							this.userlist();
+						} else {
+							this.$Message.error(res.data.msg);
+						}
+					});
+				}
 			},
 			// 杂货打包
 			setPackage(){
@@ -341,6 +390,7 @@
 				}];
 				this.select_gys_id = "";
 				this.select_dyj_id = "";
+				this.express_value = "";
 			},
 			//获取仓库列表
 			getWmsList(){
@@ -819,11 +869,6 @@
 							path: '/login'
 						})
 					} else {
-						if(this.selSign == 2){
-							this.isSelected = true;
-						}else{
-							this.isSelected = false;
-						}
 						this.tableData = res.data.data.data;
 						this.total = res.data.data.total;
 					}
