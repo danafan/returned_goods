@@ -13,6 +13,10 @@
 					</el-table-column>
 					<el-table-column prop="package_num" label="退货包裹数量(个)">
 					</el-table-column>
+					<el-table-column prop="arrive_goods_num" label="送达商品数">
+					</el-table-column>
+					<el-table-column prop="arrive_package_num" label="送达包裹数">
+					</el-table-column>
 					<el-table-column width="120px" label="操作">
 						<template slot-scope="scope">
 							<el-button @click="handleEdit(scope.$index, scope.row)">查看详情</el-button>
@@ -122,6 +126,14 @@
 					{
 						value: '3',
 						label: '退货包裹数量'
+					},
+					{
+						value: '4',
+						label: '送达的商品数'
+					},
+					{
+						value: '5',
+						label: '送达的包裹数'
 					}
 				],
 				tableData: [],
@@ -145,7 +157,9 @@
 						let supplier_num = {
 							goods_num: res.data.data.goods_num,
 							package_num: res.data.data.package_num,
-							supplier_num: res.data.data.supplier_num
+							supplier_num: res.data.data.supplier_num,
+							arrive_package_num: res.data.data.arrive_package_num,
+							arrive_goods_num: res.data.data.arrive_goods_num,
 						};
 						if (this.tableData.length != 0) {
 							this.tableData = [];
@@ -251,7 +265,9 @@
 						let supplier_num = {
 							goods_num: res.data.data.statistics.goods_num,
 							package_num: res.data.data.statistics.package_num,
-							supplier_num: res.data.data.statistics.supplier_num
+							supplier_num: res.data.data.statistics.supplier_num,
+							arrive_package_num: res.data.data.statistics.arrive_package_num,
+							arrive_goods_num: res.data.data.statistics.arrive_goods_num,
 						}
 						this.tableData.push(supplier_num);
 						let xAxisarr = res.data.data.table.day;

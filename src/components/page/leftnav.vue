@@ -3,6 +3,10 @@
 		<h3>退货管理</h3>
 		<Form :model="formItem" :label-width="80" style="margin-top: 50px;text-align: left;" onsubmit="return false">
 			<FormItem>
+				<el-select style="width: 100px;" size="small" v-model="time_type" placeholder="请选择">
+					<el-option label="打包时间" value="1"></el-option>
+					<el-option label="送达时间" value="2"></el-option>
+				</el-select>
 				<DatePicker :transfer="true" :value="dateArr" format="yyyy-MM-dd" type="daterange" placement="bottom-end" placeholder="选择日期" :clearable="false" style="width: 200px" @on-change="changeDate"></DatePicker>
 				<Input v-model="formItem.sku" placeholder="请输入SKU名称" clearable style="width: 200px" />
 				<Input v-model="formItem.id" placeholder="请输入包裹ID" clearable style="width: 200px" />
@@ -213,7 +217,8 @@
 					peoplename: '',
 					id: ''
 				},
-				dateArr:[],		//时间区间
+				time_type:'1',			//时间类型
+				dateArr:[],				//时间区间
 				cityList: [],
 				cityList1: [],
 				cityList2: [],
@@ -510,7 +515,7 @@
 			},
 			//多加的按钮
 			shabi(){
-				window.location.href = "/admin/goods/arriveexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem.end_date + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+				window.location.href = "/admin/goods/arriveexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem.end_date + '&time_type=' + this.time_type +  '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
 			},
 			//请输入供应商名称
 			providename(value) {
@@ -666,7 +671,7 @@
 					}
 				} else {
 					window.location.href = "/admin/goods/goodsexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem
-					.end_date + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
+					.end_date + '&time_type=' + this.time_type + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
 					'&username=' + this.formItem.peoplename +
 					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
 				}
@@ -688,7 +693,7 @@
 					}
 				} else {
 					window.location.href = "/admin/goods/exportbysupplier?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem
-					.end_date + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
+					.end_date + '&time_type=' + this.time_type + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
 					'&username=' + this.formItem.peoplename +
 					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
 				}
@@ -846,6 +851,7 @@
 					params: {
 						pagesize: 10,
 						page: this.current,
+						time_type:this.time_type,
 						start_date: this.formItem.start_date,
 						end_date: this.formItem.end_date,
 						sku: this.formItem.sku,

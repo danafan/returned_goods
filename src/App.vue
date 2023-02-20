@@ -17,6 +17,7 @@
 			// 			path: '/home'
 			// 		});
 			// });
+			// return;
 			
 			this.$axios.get('admin/login', {
 				
