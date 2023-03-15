@@ -8,6 +8,7 @@ import error from '@/components/page/error' //404
 import leftnav from '@/components/page/leftnav' //退货
 import return_goods from '@/components/page/return_goods' //退货
 import goodslist from '@/components/page/goodslist' //退货
+import tag_record from '@/components/page/tag_record' //标记记录列表
 import pageack from '@/components/page/pageack' //近期查看包裹详情
 import totle from '@/components/page/totle' //首页数据统计
 import warn from '@/components/page/warn' //报警提示管理
@@ -60,6 +61,10 @@ const router = new Router({
 		{
 			path: '/goodslist',
 			component: goodslist,
+		},
+		{
+			path: '/tag_record',
+			component: tag_record,
 		}, {
 			path: '/pageack',
 			component: pageack,

@@ -32,6 +32,7 @@
 							</template>
 							<MenuItem name="3-1" to="/warn">报警提示</MenuItem>
 							<MenuItem name="3-2" to="/goodslist">异常包裹记录</MenuItem>
+							<MenuItem name="3-3" to="/tag_record">标记记录</MenuItem>
 						</Submenu>
 						<Submenu name="4">
 							<template slot="title">
