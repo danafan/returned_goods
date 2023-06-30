@@ -34,9 +34,12 @@
 			</Option>
 		</div>
 	</AutoComplete>
-	<i-select style="width:200px" :model.sync="selSign" @on-change="signChange">
+	<!-- <i-select style="width:200px" :model.sync="selSign" @on-change="signChange">
 		<i-option v-for="item in signList" :key="item.value" :value="item.value">{{ item.text }}</i-option>
-	</i-select>
+	</i-select> -->
+	<Select v-model="selSign" style="width:200px">
+		<Option v-for="item in signList" :key="item.value" :value="item.value">{{ item.text }}</Option>
+	</Select>
 	<Select v-model="is_draw_bill" style="width:200px">
 		<Option v-for="item in drawBillList" :key="item.value" :value="item.value">{{ item.text }}</Option>
 	</Select>
@@ -515,7 +518,7 @@
 			},
 			//多加的按钮
 			shabi(){
-				window.location.href = "/admin/goods/arriveexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem.end_date + '&time_type=' + this.time_type +  '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+				window.location.href = "/admin/goods/arriveexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem.end_date + '&time_type=' + this.time_type + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 			},
 			//请输入供应商名称
 			providename(value) {
@@ -657,45 +660,45 @@
 			excel() {
 				if (this.type1 === 1) {
 					if (this.supplier_id) {
-						window.location.href = "/admin/goods/goodsexport?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
+						window.location.href = "/admin/goods/goodsexport?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
 					} else if (this.formItem.sku) {
-						window.location.href = "/admin/goods/goodsexport?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
+						window.location.href = "/admin/goods/goodsexport?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
 					} else if (this.formItem.id) {
-						window.location.href = "/admin/goods/goodsexport?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
+						window.location.href = "/admin/goods/goodsexport?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
 					} else if (this.carnumber) {
-						window.location.href = "/admin/goods/goodsexport?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
+						window.location.href = "/admin/goods/goodsexport?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
 					} else if (this.peoplename) {
-						window.location.href = "/admin/goods/goodsexport?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
+						window.location.href = "/admin/goods/goodsexport?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
 					} else {
-						window.location.href = "/admin/goods/goodsexport?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
+						window.location.href = "/admin/goods/goodsexport?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
 					}
 				} else {
 					window.location.href = "/admin/goods/goodsexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem
 					.end_date + '&time_type=' + this.time_type + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
 					'&username=' + this.formItem.peoplename +
-					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id;
+					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
 				}
 			},
 			excel1() {
 				if (this.type1 === 1) {
 					if (this.supplier_id) {
-						window.location.href = "/admin/goods/exportbysupplier?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/exportbysupplier?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 					} else if (this.formItem.sku) {
-						window.location.href = "/admin/goods/exportbysupplier?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/exportbysupplier?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 					} else if (this.formItem.id) {
-						window.location.href = "/admin/goods/exportbysupplier?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/exportbysupplier?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 					} else if (this.carnumber) {
-						window.location.href = "/admin/goods/exportbysupplier?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/exportbysupplier?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 					} else if (this.peoplename) {
-						window.location.href = "/admin/goods/exportbysupplier?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/exportbysupplier?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 					} else {
-						window.location.href = "/admin/goods/exportbysupplier?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+						window.location.href = "/admin/goods/exportbysupplier?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 					}
 				} else {
 					window.location.href = "/admin/goods/exportbysupplier?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem
 					.end_date + '&time_type=' + this.time_type + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
 					'&username=' + this.formItem.peoplename +
-					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark;
+					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&exception_status=' + this.selSign;
 				}
 			},
 			//多选
