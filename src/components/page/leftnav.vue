@@ -44,9 +44,12 @@
 		<Option v-for="item in drawBillList" :key="item.value" :value="item.value">{{ item.text }}</Option>
 	</Select>
 	<!-- 仓库选择 -->
-	<Select v-model="wms_co_id" style="width:200px" placeholder="请选择仓库">
+	<!-- <Select v-model="wms_co_id" style="width:200px" placeholder="请选择仓库">
 		<Option v-for="item in wmsList" :key="item.wms_co_id" :value="item.wms_co_id">{{ item.name }}</Option>
-	</Select>
+	</Select> -->
+	<el-select style="width: 200px;" size="small" v-model="wms_co_id" clearable multiple filterable collapse-tags placeholder="请选择仓库">
+		<el-option v-for="item in wmsList" :label="item.name" :key="item.wms_co_id" :value="item.wms_co_id"></el-option>
+	</el-select>
 	<Input v-model="remark" placeholder="请输入备注" clearable style="width: 200px" />
 	<Button type="info" @click="search">查询</Button>
 </FormItem>
@@ -305,7 +308,7 @@
 				modal3:false,
 				big_img_url:"",
 				wmsList:[],					//仓库列表
-				wms_co_id:"",			//查询条件仓库
+				wms_co_id:[],			//查询条件仓库
 				wms_id:"",				//批量打包选中的仓库
 				expressDialog:false,	//填写快递单号弹窗
 				express_value:"",		//填写的快递单号
@@ -327,8 +330,8 @@
 				})
 				.then(res => {
 						// console.log(res.data)
-						this.img = res.request.responseURL;
-					});
+					this.img = res.request.responseURL;
+				});
 			},
 			//点击填写快递单号
 			addExpress(package_id,express_no){
@@ -658,25 +661,26 @@
 
 			},
 			excel() {
+				let wms_co_id_str = this.wms_co_id.join(',');
 				if (this.type1 === 1) {
 					if (this.supplier_id) {
-						window.location.href = "/admin/goods/goodsexport?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
+						window.location.href = "/admin/goods/goodsexport?supplier=" + this.supplier_id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + wms_co_id_str + '&exception_status=' + this.selSign;
 					} else if (this.formItem.sku) {
-						window.location.href = "/admin/goods/goodsexport?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
+						window.location.href = "/admin/goods/goodsexport?sku=" + this.formItem.sku + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + wms_co_id_str + '&exception_status=' + this.selSign;
 					} else if (this.formItem.id) {
-						window.location.href = "/admin/goods/goodsexport?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
+						window.location.href = "/admin/goods/goodsexport?package_id=" + this.formItem.id + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + wms_co_id_str + '&exception_status=' + this.selSign;
 					} else if (this.carnumber) {
-						window.location.href = "/admin/goods/goodsexport?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
+						window.location.href = "/admin/goods/goodsexport?car=" + this.carnumber + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + wms_co_id_str + '&exception_status=' + this.selSign;
 					} else if (this.peoplename) {
-						window.location.href = "/admin/goods/goodsexport?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
+						window.location.href = "/admin/goods/goodsexport?username=" + this.peoplename + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + wms_co_id_str + '&exception_status=' + this.selSign;
 					} else {
-						window.location.href = "/admin/goods/goodsexport?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
+						window.location.href = "/admin/goods/goodsexport?type=" + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + wms_co_id_str + '&exception_status=' + this.selSign;
 					}
 				} else {
 					window.location.href = "/admin/goods/goodsexport?start_date=" + this.formItem.start_date + '&end_date=' + this.formItem
 					.end_date + '&time_type=' + this.time_type + '&supplier=' + this.formItem.provides + '&sku=' + this.formItem.sku + '&car=' + this.formItem.carnumber +
 					'&username=' + this.formItem.peoplename +
-					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + this.wms_co_id + '&exception_status=' + this.selSign;
+					'&package_id=' + this.formItem.id + '&status=' + this.btnvalue + '&type=' + this.type1 + '&is_draw_bill=' + this.is_draw_bill + '&remark=' + this.remark + '&wms_co_id=' + wms_co_id_str + '&exception_status=' + this.selSign;
 				}
 			},
 			excel1() {
@@ -867,7 +871,7 @@
 						exception_status:this.selSign,
 						is_draw_bill:this.is_draw_bill,
 						remark:this.remark,
-						wms_co_id:this.wms_co_id
+						wms_co_id:this.wms_co_id.join(',')
 					},
 
 				})
@@ -909,66 +913,66 @@
 	}
 </script>
 <style type="text/css">
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appearance: none;}
+	input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appearance: none;}
 </style>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.leftnav {
-	width: 100%;
-	height: 100%;
-}
+	.leftnav {
+		width: 100%;
+		height: 100%;
+	}
 
-#page {
-	text-align: right;
-	margin-top: 20px;
-}
+	#page {
+		text-align: right;
+		margin-top: 20px;
+	}
 
-#btnarr {
-	display:flex;
-	align-items: center;
-	justify-content: space-between;
-}
-.left_button{
-	display:flex;
-}
-.setBut{
-	margin-left: 5px;
-}
-.btnones {
-	background: #2d8cf0;
-	color: white;
-}
+	#btnarr {
+		display:flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.left_button{
+		display:flex;
+	}
+	.setBut{
+		margin-left: 5px;
+	}
+	.btnones {
+		background: #2d8cf0;
+		color: white;
+	}
 
-#btnones {
-	background: #2d8cf0;
-	color: white;
-}
+	#btnones {
+		background: #2d8cf0;
+		color: white;
+	}
 
-.btnones:active {
-	background: #2d8cf0;
-	color: white;
-}
+	.btnones:active {
+		background: #2d8cf0;
+		color: white;
+	}
 
-.demo-auto-complete-item {
-	height: 200px;
-	overflow: auto;
-}
-.goods_row{
-	margin-bottom: 15px;
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-}
-.num_icon{
-	margin-left: 20px;
-	font-size: 20px;
-}
-.asd{
-	display:flex;
-	align-items: center;
-	justify-content: center;
-}
-.routere{
-	transform: rotate(-90deg);
-}
+	.demo-auto-complete-item {
+		height: 200px;
+		overflow: auto;
+	}
+	.goods_row{
+		margin-bottom: 15px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+	}
+	.num_icon{
+		margin-left: 20px;
+		font-size: 20px;
+	}
+	.asd{
+		display:flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.routere{
+		transform: rotate(-90deg);
+	}
 </style>
