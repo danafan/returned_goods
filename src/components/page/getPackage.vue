@@ -16,32 +16,36 @@
 		<el-table :data="tableObj.data" border>
 			<el-table-column label="图片">
 				<template slot-scope="scope">
-					<img style="width: 80px;height: 80px" :src="scope.row.image" @click="bigImg(scope.row.image)">
-				</template>
-			</el-table-column>
-			<el-table-column prop="supplier_name" label="供应商">
-			</el-table-column>
-			<el-table-column prop="num" label="数量">
-			</el-table-column>
-			<el-table-column prop="package_id" label="包裹号码" width="200">
-			</el-table-column>
-			<el-table-column prop="username" label="上传人">
-			</el-table-column>
-			<el-table-column prop="car_no" label="车牌号">
-			</el-table-column>
-			<el-table-column prop="time" label="时间" width="200">
-			</el-table-column>
-			<el-table-column label="操作">
-				<template slot-scope="scope">
-					<Button type="primary" @click="deleteItem(scope.row.id)">删除</Button>
-				</template>
-			</el-table-column>
-		</el-table>
-		<Page :total="tableObj.total" show-total @on-change="pageChange" :current="page"/>
-		<Modal v-model="modal3">
-			<img style="width: 100%" :src="big_img_url">
-		</Modal>
-	</div>
+					<el-image 
+					 style="width: 80px;height: 80px"
+					:src="scope.row.image" 
+					:preview-src-list="[scope.row.image]">
+				</el-image>
+			</template>
+		</el-table-column>
+		<el-table-column prop="supplier_name" label="供应商">
+		</el-table-column>
+		<el-table-column prop="num" label="数量">
+		</el-table-column>
+		<el-table-column prop="package_id" label="包裹号码" width="200">
+		</el-table-column>
+		<el-table-column prop="username" label="上传人">
+		</el-table-column>
+		<el-table-column prop="car_no" label="车牌号">
+		</el-table-column>
+		<el-table-column prop="time" label="时间" width="200">
+		</el-table-column>
+		<el-table-column label="操作">
+			<template slot-scope="scope">
+				<Button type="primary" @click="deleteItem(scope.row.id)">删除</Button>
+			</template>
+		</el-table-column>
+	</el-table>
+	<Page :total="tableObj.total" show-total @on-change="pageChange" :current="page"/>
+	<Modal v-model="modal3">
+		<img style="width: 100%" :src="big_img_url">
+	</Modal>
+</div>
 </template>
 
 <script>
@@ -100,64 +104,64 @@
         		this.big_img_url = big_img_url;
         	},
 			//切换日期
-			changeDate(date){
-				this.date_list = date;
-			},
+        	changeDate(date){
+        		this.date_list = date;
+        	},
 			//查询
-			search() {
-				this.page = 1;
-				this.getList();
-			},
+        	search() {
+        		this.page = 1;
+        		this.getList();
+        	},
 			// 切换页码
-			pageChange(val) {
-				this.page = val;
-				this.getList();
-			},
+        	pageChange(val) {
+        		this.page = val;
+        		this.getList();
+        	},
 			//导出
-			exportFile(){
-				this.$Modal.confirm({
-					title: '确认导出？',
-					onOk: () => {
-						let open_url = `${location.origin}/admin/takegoodslog/export?start_date=${this.date_list[0]}&end_date=${this.date_list[1]}&content=${this.content}`;
-						window.open(open_url);
-					},
-					onCancel: () => {
-						this.$Message.warning('取消');
-					}
-				});
-			},
+        	exportFile(){
+        		this.$Modal.confirm({
+        			title: '确认导出？',
+        			onOk: () => {
+        				let open_url = `${location.origin}/admin/takegoodslog/export?start_date=${this.date_list[0]}&end_date=${this.date_list[1]}&content=${this.content}`;
+        				window.open(open_url);
+        			},
+        			onCancel: () => {
+        				this.$Message.warning('取消');
+        			}
+        		});
+        	},
 			//获取列表
-			getList(){
-				let req = {
-					page:this.page,
-					start_date:this.date_list[0],
-					end_date:this.date_list[1],
-					content:this.content
-				}
-				this.$axios.get('admin/takegoodslog/list', {
-					params: req
-				}).then(res => {
-					this.tableObj = res.data.data;
-				});
-			},
+        	getList(){
+        		let req = {
+        			page:this.page,
+        			start_date:this.date_list[0],
+        			end_date:this.date_list[1],
+        			content:this.content
+        		}
+        		this.$axios.get('admin/takegoodslog/list', {
+        			params: req
+        		}).then(res => {
+        			this.tableObj = res.data.data;
+        		});
+        	},
 			//删除
-			deleteItem(id){
-				this.$Modal.confirm({
-					title: '确认删除',
-					onOk: () => {
-						this.$axios.post('admin/takegoodslog/del', {id:id}).then(res => {
-							this.$Message.success('删除成功');
+        	deleteItem(id){
+        		this.$Modal.confirm({
+        			title: '确认删除',
+        			onOk: () => {
+        				this.$axios.post('admin/takegoodslog/del', {id:id}).then(res => {
+        					this.$Message.success('删除成功');
 							//获取列表
-							this.getList();
-						});
-					},
-					onCancel: () => {
-						this.$Message.warning('取消');
-					}
-				});
-			}
-		}
-	}
+        					this.getList();
+        				});
+        			},
+        			onCancel: () => {
+        				this.$Message.warning('取消');
+        			}
+        		});
+        	}
+        }
+    }
 </script>
 <style scoped>
 
