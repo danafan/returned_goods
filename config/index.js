@@ -12,8 +12,8 @@ module.exports = {
 		assetsPublicPath: '/',
 		proxyTable: {
 			'/': {
-				target: 'http://erpcs.92nu.com/',
-				// target: 'http://erpdeer.92nu.com/',
+				// target: 'http://erpcs.92nu.com/',
+				target: 'http://erpdeer.92nu.com/',
 				changeOrigin: true,
 				pathRewrite: {
 					'^/': '/'

@@ -70,15 +70,15 @@
 </div>
 <el-table :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange" ref="multipleTable">
 	<el-table-column type="selection" width="55" fixed="left"></el-table-column>
-	<el-table-column prop="supplier_name" label="供应商名称">
+	<el-table-column prop="supplier_name" width="100" label="供应商名称">
 	</el-table-column>
-	<el-table-column prop="wms_name" label="仓库">
+	<el-table-column prop="wms_name" width="120" label="仓库">
 	</el-table-column>
 	<el-table-column prop="package_id" label="包裹ID">
 	</el-table-column>
-	<el-table-column prop="goods_num" label="退货总数量(件)">
+	<el-table-column prop="goods_num" width="120" label="退货总数量(件)">
 	</el-table-column>
-	<el-table-column prop="time" label="更新时间">
+	<el-table-column prop="time" width="100" label="更新时间">
 	</el-table-column>
 	<el-table-column prop="status" label="状态">
 	</el-table-column>
@@ -98,15 +98,16 @@
 			<img class="routere" v-if="scope.row.sign_img != ''" style="width: 80px;height: 80px" :src="scope.row.sign_img" @click="bigImg(scope.row.sign_img)">
 		</template>
 	</el-table-column>
-	<el-table-column width="650" label="操作">
+	<el-table-column width="620" label="操作">
 		<template slot-scope="scope">
-			<el-button type="primary" @click="addExpress(scope.row.package_id,scope.row.express_no)">填写快递单号</el-button>
-			<el-button type="primary" @click="handleEditss(scope.$index, scope.row)">查看包裹码</el-button>
-			<el-button type="primary" v-if="scope.row.is_draw_bill == 0 && scope.row.status_id == 4" @click="tagDraw(scope.row.package_id)">标记已开单</el-button>
-			<el-button type="primary" v-if="scope.row.status_id < 4 && scope.row.exception_status == 0" @click="biao(scope.row.package_id)">标记异常</el-button>
-			<el-button type="success" v-if="scope.row.exception_status == 1">已标记</el-button>
-			<el-button type="primary" @click="handleEdit(scope.$index, scope.row,1)">状态详情</el-button>
-			<el-button type="primary" @click="goodslist(scope.$index, scope.row)">商品详情</el-button>
+			<el-button type="primary" size='mini' @click="reprintFn(scope.row.package_id)">补打退货单</el-button>
+			<el-button type="primary" size='mini' @click="addExpress(scope.row.package_id,scope.row.express_no)">填写快递单号</el-button>
+			<el-button type="primary" size='mini' @click="handleEditss(scope.$index, scope.row)">查看包裹码</el-button>
+			<el-button type="primary" size='mini' v-if="scope.row.is_draw_bill == 0 && scope.row.status_id == 4" @click="tagDraw(scope.row.package_id)">标记已开单</el-button>
+			<el-button type="primary" size='mini' v-if="scope.row.status_id < 4 && scope.row.exception_status == 0" @click="biao(scope.row.package_id)">标记异常</el-button>
+			<el-button type="success" size='mini' v-if="scope.row.exception_status == 1">已标记</el-button>
+			<el-button type="primary" size='mini' @click="handleEdit(scope.$index, scope.row,1)">状态详情</el-button>
+			<el-button type="primary" size='mini' @click="goodslist(scope.$index, scope.row)">商品详情</el-button>
 		</template>
 	</el-table-column>
 </el-table>
@@ -185,6 +186,22 @@
 	<div slot="footer" class="dialog-footer">
 		<el-button type="primary" size="small" @click="expressDialog = false">取消</el-button>
 		<el-button type="primary" size="small" @click="commitExpress">提交</el-button>
+	</div>
+</el-dialog>
+<!-- 补打退货单 -->
+<el-dialog title="补打退货单" @close="choose = ''" width="400px" :close-on-click-modal="false" :visible.sync="printerDialog">
+	<div>
+		<div class="goods_row">
+			打印机：
+			<el-select size="small" v-model="choose" clearable :popper-append-to-body="false" filterable placeholder="选择打印机">
+				<el-option v-for="item in dyjList" :key="item" :label="item" :value="item">
+				</el-option>
+			</el-select>
+		</div>
+	</div>
+	<div slot="footer" class="dialog-footer">
+		<el-button size="small" @click="printerDialog = false">取消</el-button>
+		<el-button type="primary" size="small" @click="commitPrinter">提交</el-button>
 	</div>
 </el-dialog>
 </div>
@@ -313,6 +330,8 @@
 				expressDialog:false,	//填写快递单号弹窗
 				express_value:"",		//填写的快递单号
 				package_id:"",			//点击的ID
+				printerDialog:false,	//补打退货单
+				choose:"",				//选中的打印机
 			}
 		},
 		methods: {
@@ -379,8 +398,6 @@
 				this.packDialog = true;
 				//获取供应商列表
 				this.getGysList();
-				//获取打印机列表
-				this.getDyjList();
 			},
 			//删除商品
 			reductGoods(i){
@@ -428,6 +445,30 @@
 				})
 				.then(res => {
 					this.dyjList = res.data;
+				});
+			},
+			// 补打退货单
+			reprintFn(packageId){
+				this.package_id = packageId;
+				this.printerDialog = true;
+			},
+			//补打退货单提交
+			commitPrinter(){
+				if(this.choose == ''){
+					this.$message.warning('请选择打印机'); 
+					return;
+				}
+				let arg = {
+					packageId:this.package_id,
+					choose:this.choose
+				}
+				this.$axios.post('admin/package/reprint', arg).then(res => {
+					if (res.data.code == 1) {
+						this.$message.success(res.data.msg);
+						this.printerDialog = false;
+					} else {
+						this.$Message.error(res.data.msg);
+					}
 				});
 			},
 			//提交
@@ -909,6 +950,8 @@
 			this.userlist();
 			//获取仓库列表
 			this.getWmsList();
+			//获取打印机列表
+			this.getDyjList();
 		}
 	}
 </script>
